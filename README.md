@@ -25,7 +25,7 @@ unset env COLUMNS
 
 ![Preparing the environment](/00.png)
 
-## Lookint at the binary
+## Looking at the binary
 The `system(3)` call sequence begins at `0x80485e0 <main+138>`
 This is our target.
 
@@ -47,28 +47,28 @@ This means the `strcmp(3)` will never succeed.
 ![Test input](/02.png)
 
 ## Track down the buffer overflow
-We can use `r < [input file]` to give gdb a file to use as stdin.
+We can use `r < [input file]` to give gdb a file to use as `stdin`.
 The breakpoint after `scanf(3)` is no longer useful.
 
 ```break
 delete 1
 ```
 
-### First payload (executed in the system shell):
+### First payload (executed in the system shell)
 ```bash
 perl -e 'print "A"x32' > payload_gdb.dat
 ```
 
 ![Payload 1](/03.png)
 
-### Second payload:
+### Second payload
 ```bash
 perl -e 'print "A"x16 . "B"x16' > payload_gdb.dat
 ```
 
 ![Payload 2](/04.png)
 
-### Third payload:
+### Third payload
 ```bash
 perl -e 'print "A"x16' > payload_gdb.dat
 ```
@@ -94,7 +94,7 @@ We obviously need to control `eip`.
 This means we need to be able to have our payload value at the top of the stack right before `ret`.
 Remembering the part above, we want to set `esp` to an address in `buffer`.
 That way `ret` will pop a value that we can control as the return address.
-We can calculate that `ecx` is loaded from an address `buffer + 0x18` (24 bytes past `buffer`).
+We can calculate that `ecx` is loaded from the address `buffer + 0x18` (24 bytes past `buffer`).
 
 ```bash
 perl -e 'print "A"x24 . "BBBB"' > payload_gdb.dat
