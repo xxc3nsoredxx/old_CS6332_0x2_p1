@@ -1,0 +1,6 @@
+*.ppm
+.gdb_history
+*.dat
+solve
+test0x01_x86
+peda*
